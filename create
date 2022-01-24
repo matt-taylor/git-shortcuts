@@ -1,0 +1,76 @@
+#!/bin/bash -e
+
+help_echo () {
+  echo
+  echo    "Usage: ./create"
+  echo -e "\t -c|--command  - Set flag when to create new git command"
+  echo -e "\t -s|--script   - Set flag when to create new git script"
+  echo -e "\t -f|--file     - Flag defines the name of the file to create"
+}
+
+POSITIONAL_ARGS=()
+COMMAND="1"
+SCRIPT="1"
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    -c|--command)
+      COMMAND="0"
+      shift # past argument
+      ;;
+    -s|--script)
+      SCRIPT="0"
+      shift # past argument
+      ;;
+    -f|--file)
+      FILENAME="$2"
+      shift # past argument
+      shift # past value
+      ;;
+    -h|--help)
+      help_echo
+      exit 0
+      ;;
+    -*|--*)
+      echo "Unknown option $1"
+      help_echo
+      exit 1
+      ;;
+    *)
+      POSITIONAL_ARGS+=("$1") # save positional arg
+      shift # past argument
+      ;;
+  esac
+done
+
+set -- "${POSITIONAL_ARGS[@]}" # restore positional parameters
+
+if [[ -z "$FILENAME" ]]; then
+  echo "Must provide file option."
+  help_echo
+  exit 1
+fi
+
+create_file () {
+  local path=$1
+  local file_name=$2
+  local file_path="$path/$file_name"
+  local type=$3
+  if [ -f "$file_path" ]; then
+    echo "WARNING: [$file_name] file name exists as part of [$type]. Try a different name"
+    return
+  fi
+  echo "#!/bin/bash -e" > $file_path
+  chmod u+x $file_path
+
+  echo "Creted File: $file_path"
+}
+
+if [ $SCRIPT = "0" ]; then
+  sript_path="$(pwd)/scripts"
+  create_file $sript_path $FILENAME 'script'
+fi
+
+if [ $COMMAND = "0" ]; then
+  command_path="$(pwd)/commands"
+  create_file $command_path $FILENAME 'command'
+fi
