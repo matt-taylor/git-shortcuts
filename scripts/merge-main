@@ -70,6 +70,7 @@ if [ $COMMIT = "0" ]; then
 fi
 branch_name=$(./$__commands_dir__/current_branch)
 MESSAGE="${MESSAGE:='stashing without a commit'}"
+
 git stash -m "gs-merge: $MESSAGE"
 
 git fetch $REMOTE
