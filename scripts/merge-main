@@ -11,12 +11,16 @@ help_echo () {
   echo -e "\t -c|--commit   - With bit set, will attempt to commit files before merge"
   echo -e "\t -f|--files    - Regex of files to commit. By default, will commit all files. Files not part of Regex will be stashed"
   echo -e "\t -m|--message  - Commit message to set"
+  echo -e "\t -r|--remote   - Remote to use. Default is origin"
+  echo -e "\t -b|--branch   - Branch to attempt to merge into current branch. Default is main"
 }
 
 POSITIONAL_ARGS=()
 COMMIT="1"
 COMMIT_FILES="."
 MESSAGE=""
+REMOTE="origin"
+BRANCH="main"
 while [[ $# -gt 0 ]]; do
   case $1 in
     -c|--commit)
@@ -30,6 +34,16 @@ while [[ $# -gt 0 ]]; do
       ;;
     -f|--files)
       COMMIT_FILES="$2"
+      shift # past argument
+      shift # past value
+      ;;
+    -r|--remote)
+      REMOTE="$2"
+      shift # past argument
+      shift # past value
+      ;;
+    -b|--branch)
+      BRANCH="$2"
       shift # past argument
       shift # past value
       ;;
@@ -54,8 +68,13 @@ if [ $COMMIT = "0" ]; then
   ./$__scripts_dir__/commit -f "\"$COMMIT_FILES\"" -m "$MESSAGE"
   # [ $? -eq 0 ]  || exit 1
 fi
-
+branch_name=$(./$__commands_dir__/current_branch)
 MESSAGE="${MESSAGE:='stashing without a commit'}"
 git stash -m "gs-merge: $MESSAGE"
-git pull --rebase
+
+git fetch $REMOTE
+git checkout $BRANCH
+git pull $REMOTE $BRANCH
+git checkout $branch_name
+
 git stash apply
