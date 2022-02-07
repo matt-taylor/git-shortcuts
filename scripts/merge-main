@@ -1,6 +1,7 @@
 #!/bin/bash -e
 
 __commands_dir__="$(dirname "$0")/../commands"
+__scripts_dir__="$(dirname "$0")"
 
 $(./$__commands_dir__/is_working_tree?)
 [ $? -eq 0 ]  || exit 1
@@ -49,5 +50,12 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [ $COMMIT = "0" ]; then
-
+  export SKIP_HELP_ECHO='0'
+  $(./$__scripts_dir__/commit -f "$COMMIT_FILES" -m "$MESSAGE")
+  # [ $? -eq 0 ]  || exit 1
 fi
+
+MESSAGE="${MESSAGE:='stashing without a commit'}"
+git stash -m "gs-merge: $MESSAGE"
+git pull --rebase
+git stash apply
