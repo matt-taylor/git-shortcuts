@@ -1,0 +1,58 @@
+#!/bin/bash -e
+
+__commands_dir__="$(dirname "$0")/../commands"
+
+$(./$__commands_dir__/is_working_tree?)
+[ $? -eq 0 ]  || exit 1
+
+help_echo () {
+  echo    "Usage: commit"
+  echo -e "\t -f|--files    - Regex of files to commit."
+  echo -e "\t -m|--message  - Commit message to set"
+}
+
+POSITIONAL_ARGS=()
+COMMIT_FILES=""
+MESSAGE=""
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    -m|--message)
+      MESSAGE="$2"
+      shift # past argument
+      shift # past value
+      ;;
+    -f|--files)
+      COMMIT_FILES="$2"
+      shift # past argument
+      shift # past value
+      ;;
+    -h|--help)
+      help_echo
+      exit 0
+      ;;
+    -*|--*)
+      echo "Unknown option $1"
+      help_echo
+      exit 1
+      ;;
+    *)
+      POSITIONAL_ARGS+=("$1") # save positional arg
+      shift # past argument
+      ;;
+  esac
+done
+
+if [[ -z "$MESSAGE" ]]; then
+  echo "Commit message must be present. Exit 1" >&2
+  help_echo
+  exit 1
+fi
+
+if [[ -z "$COMMIT_FILES" ]]; then
+  echo "Commit regex must be present. Exit 1" >&2
+  help_echo
+  exit 1
+fi
+
+git add $COMMIT_FILES
+git commit -m "$MESSAGE"

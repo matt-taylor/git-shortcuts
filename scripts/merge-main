@@ -1,0 +1,53 @@
+#!/bin/bash -e
+
+__commands_dir__="$(dirname "$0")/../commands"
+
+$(./$__commands_dir__/is_working_tree?)
+[ $? -eq 0 ]  || exit 1
+
+help_echo () {
+  echo    "Usage: merge-main"
+  echo -e "\t -c|--commit   - With bit set, will attempt to commit files before merge"
+  echo -e "\t -f|--files    - Regex of files to commit. By default, will commit all files. Files not part of Regex will be stashed"
+  echo -e "\t -m|--message  - Commit message to set"
+}
+
+POSITIONAL_ARGS=()
+COMMIT="1"
+COMMIT_FILES="."
+MESSAGE=""
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    -c|--commit)
+      COMMIT="0"
+      shift # past argument
+      ;;
+    -m|--message)
+      MESSAGE="$2"
+      shift # past argument
+      shift # past value
+      ;;
+    -f|--files)
+      COMMIT_FILES="$2"
+      shift # past argument
+      shift # past value
+      ;;
+    -h|--help)
+      help_echo
+      exit 0
+      ;;
+    -*|--*)
+      echo "Unknown option $1"
+      help_echo
+      exit 1
+      ;;
+    *)
+      POSITIONAL_ARGS+=("$1") # save positional arg
+      shift # past argument
+      ;;
+  esac
+done
+
+if [ $COMMIT = "0" ]; then
+
+fi
