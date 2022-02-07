@@ -42,6 +42,9 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+echo "Files to comit $COMMIT_FILES"
+
+
 if [[ -z "$MESSAGE" ]]; then
   echo "Commit message must be present. Exit 1" >&2
   [[ -z "$SKIP_HELP_ECHO" ]] && help_echo
