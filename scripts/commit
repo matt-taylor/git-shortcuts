@@ -27,12 +27,12 @@ while [[ $# -gt 0 ]]; do
       shift # past value
       ;;
     -h|--help)
-      help_echo
+      [[ -z "$SKIP_HELP_ECHO" ]] && help_echo
       exit 0
       ;;
     -*|--*)
       echo "Unknown option $1"
-      help_echo
+      [[ -z "$SKIP_HELP_ECHO" ]] && help_echo
       exit 1
       ;;
     *)
@@ -44,13 +44,13 @@ done
 
 if [[ -z "$MESSAGE" ]]; then
   echo "Commit message must be present. Exit 1" >&2
-  help_echo
+  [[ -z "$SKIP_HELP_ECHO" ]] && help_echo
   exit 1
 fi
 
 if [[ -z "$COMMIT_FILES" ]]; then
   echo "Commit regex must be present. Exit 1" >&2
-  help_echo
+  [[ -z "$SKIP_HELP_ECHO" ]] && help_echo
   exit 1
 fi
 
