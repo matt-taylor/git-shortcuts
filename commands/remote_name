@@ -1,0 +1,9 @@
+#!/bin/bash -e
+
+__commands_dir__="$(dirname "$0")"
+
+$(./$__commands_dir__/is_working_tree?)
+[ $? -eq 0 ]  || exit 1
+
+remote_metadata=$(git config --get remote.origin.url)
+basename -s .git $remote_metadata

@@ -1,0 +1,81 @@
+#!/bin/bash -e
+
+__commands_dir__="$(dirname "$0")/../commands"
+__scripts_dir__="$(dirname "$0")"
+
+$(./$__commands_dir__/is_working_tree?)
+[ $? -eq 0 ]  || exit 1
+
+help_echo () {
+  echo    "Usage: merge-main"
+  echo -e "\t -c|--commit   - With bit set, will attempt to commit files before merge"
+  echo -e "\t -f|--files    - Regex of files to commit. By default, will commit all files. Files not part of Regex will be stashed"
+  echo -e "\t -m|--message  - Commit message to set"
+  echo -e "\t -r|--remote   - Remote to use. Default is origin"
+  echo -e "\t -b|--branch   - Branch to attempt to merge into current branch. Default is main"
+}
+
+POSITIONAL_ARGS=()
+COMMIT="1"
+COMMIT_FILES="."
+MESSAGE=""
+REMOTE="origin"
+BRANCH="main"
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    -c|--commit)
+      COMMIT="0"
+      shift # past argument
+      ;;
+    -m|--message)
+      MESSAGE="$2"
+      shift # past argument
+      shift # past value
+      ;;
+    -f|--files)
+      COMMIT_FILES="$2"
+      shift # past argument
+      shift # past value
+      ;;
+    -r|--remote)
+      REMOTE="$2"
+      shift # past argument
+      shift # past value
+      ;;
+    -b|--branch)
+      BRANCH="$2"
+      shift # past argument
+      shift # past value
+      ;;
+    -h|--help)
+      help_echo
+      exit 0
+      ;;
+    -*|--*)
+      echo "Unknown option $1"
+      help_echo
+      exit 1
+      ;;
+    *)
+      POSITIONAL_ARGS+=("$1") # save positional arg
+      shift # past argument
+      ;;
+  esac
+done
+
+if [ $COMMIT = "0" ]; then
+  export SKIP_HELP_ECHO='0'
+  ./$__scripts_dir__/commit -f "\"$COMMIT_FILES\"" -m "$MESSAGE"
+  # [ $? -eq 0 ]  || exit 1
+fi
+branch_name=$(./$__commands_dir__/current_branch)
+MESSAGE="${MESSAGE:='stashing without a commit'}"
+
+git stash -m "gs-merge: $MESSAGE"
+
+git fetch $REMOTE
+git checkout $BRANCH
+git pull $REMOTE $BRANCH
+git checkout $branch_name
+
+git stash apply

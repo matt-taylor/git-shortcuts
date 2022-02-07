@@ -1,0 +1,25 @@
+#!/bin/bash -e
+
+__commands_dir__="$(dirname "$0")/../commands"
+
+$(./$__commands_dir__/is_working_tree?)
+[ $? -eq 0 ]  || exit 1
+
+remote_name=$($__commands_dir__/remote_name)
+[ $? -eq 0 ]  || exit 1
+
+if [ ! -f "${remote_name}.gemspec" ]
+then
+  echo "${remote_name} repo is not a gem and cannot push remote tag"  >&2
+  exit 1
+fi
+
+last_commit_sha=$(./$__commands_dir__/last_commit_sha)
+branch_name=$(./$__commands_dir__/current_branch)
+pre_tag="pre-gitshortcut-${branch_name}-$(date +%s)"
+
+git tag $pre_tag $last_commit_sha > /dev/null 2>&1
+git push origin $pre_tag > /dev/null 2>&1
+
+echo "Pushed tag $pre_tag to upstream remote $remote_name"
+echo "Gem should be available shortly"
