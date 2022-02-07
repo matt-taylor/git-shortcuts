@@ -62,7 +62,7 @@ create_file () {
   echo "#!/bin/bash -e" > $file_path
   chmod u+x $file_path
 
-  echo "Creted File: $file_path"
+  echo "Created File: $file_path"
 }
 
 if [ $SCRIPT = "0" ]; then
