@@ -51,7 +51,7 @@ done
 
 if [ $COMMIT = "0" ]; then
   export SKIP_HELP_ECHO='0'
-  $(./$__scripts_dir__/commit -f "\"$COMMIT_FILES\"" -m "$MESSAGE")
+  ./$__scripts_dir__/commit -f "\"$COMMIT_FILES\"" -m "$MESSAGE"
   # [ $? -eq 0 ]  || exit 1
 fi
 

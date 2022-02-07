@@ -22,7 +22,7 @@ while [[ $# -gt 0 ]]; do
       shift # past value
       ;;
     -f|--files)
-      COMMIT_FILES=$(echo "$2" | tr -d '"')
+      COMMIT_FILES="$2"
       shift # past argument
       shift # past value
       ;;
@@ -42,9 +42,6 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-echo "Files to comit $COMMIT_FILES"
-
-
 if [[ -z "$MESSAGE" ]]; then
   echo "Commit message must be present. Exit 1" >&2
   [[ -z "$SKIP_HELP_ECHO" ]] && help_echo
@@ -57,7 +54,5 @@ if [[ -z "$COMMIT_FILES" ]]; then
   exit 1
 fi
 
-echo "Files to comit $COMMIT_FILES"
-echo "MESSAGE to comit $MESSAGE"
-git add "$COMMIT_FILES"
+git add "$(echo $COMMIT_FILES | tr -d '"')"
 git commit -m "$MESSAGE"
