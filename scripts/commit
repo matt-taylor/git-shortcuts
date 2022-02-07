@@ -56,5 +56,5 @@ fi
 
 echo "Files to comit $COMMIT_FILES"
 echo "MESSAGE to comit $MESSAGE"
-git add $COMMIT_FILES
+git add "$COMMIT_FILES"
 git commit -m "$MESSAGE"
