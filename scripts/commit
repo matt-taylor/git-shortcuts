@@ -18,6 +18,7 @@ COMMIT_FILES=""
 PUSH="1"
 REMOTE="origin"
 MESSAGE=""
+LAST_UPDATED='none'
 while [[ $# -gt 0 ]]; do
   case $1 in
     -p|--push)
@@ -30,11 +31,13 @@ while [[ $# -gt 0 ]]; do
       shift # past value
       ;;
     -m|--message)
+      LAST_UPDATED='message'
       MESSAGE="$2"
       shift # past argument
       shift # past value
       ;;
     -f|--files)
+      LAST_UPDATED='commit'
       COMMIT_FILES="$2"
       shift # past argument
       shift # past value
@@ -44,13 +47,16 @@ while [[ $# -gt 0 ]]; do
       exit 0
       ;;
     -*|--*)
-      echo "Unknown option $1"
+      echo "Unknown option: $1"
       [[ -z "$SKIP_HELP_ECHO" ]] && help_echo
       exit 1
       ;;
     *)
-      # when the message contains multiple words
-      MESSAGE="$MESSAGE $1"
+      if [ $LAST_UPDATED = "message" ]; then
+        MESSAGE="$MESSAGE $1"
+      elif [ $LAST_UPDATED = "commit" ]; then
+        COMMIT_FILES="$COMMIT_FILES $1"
+      fi
       shift # past argument
       ;;
   esac
