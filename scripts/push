@@ -1,0 +1,42 @@
+#!/bin/bash -e
+
+#!/bin/bash -e
+
+__commands_dir__="$(dirname "$0")/../commands"
+
+$(./$__commands_dir__/is_working_tree?)
+[ $? -eq 0 ]  || exit 1
+
+help_echo () {
+  echo    "Usage: push"
+  echo -e "\t -r|--remote   - Origin name. By default it is origin"
+}
+
+PUSH="1"
+REMOTE="origin"
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    -r|--remote)
+      REMOTE="$2"
+      shift # past argument
+      shift # past value
+      ;;
+    -h|--help)
+      [[ -z "$SKIP_HELP_ECHO" ]] && help_echo
+      exit 0
+      ;;
+    -*|--*)
+      echo "Unknown option $1"
+      [[ -z "$SKIP_HELP_ECHO" ]] && help_echo
+      exit 1
+      ;;
+    *)
+      shift # past argument
+      ;;
+  esac
+done
+
+
+
+branch_name=$(./$__commands_dir__/current_branch)
+git push -u $REMOTE $branch_name
