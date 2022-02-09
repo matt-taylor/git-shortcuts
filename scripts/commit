@@ -2,7 +2,7 @@
 
 __commands_dir__="$(dirname "$0")/../commands"
 
-$(./$__commands_dir__/is_working_tree?)
+$($__commands_dir__/is_working_tree?)
 [ $? -eq 0 ]  || exit 1
 
 help_echo () {
