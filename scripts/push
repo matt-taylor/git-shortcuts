@@ -4,7 +4,7 @@
 
 __commands_dir__="$(dirname "$0")/../commands"
 
-$(./$__commands_dir__/is_working_tree?)
+$($__commands_dir__/is_working_tree?)
 [ $? -eq 0 ]  || exit 1
 
 help_echo () {
@@ -36,7 +36,5 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-
-
-branch_name=$(./$__commands_dir__/current_branch)
+branch_name=$($__commands_dir__/current_branch)
 git push -u $REMOTE $branch_name

@@ -2,7 +2,7 @@
 
 __commands_dir__="$(dirname "$0")/../commands"
 
-$(./$__commands_dir__/is_working_tree?)
+$($__commands_dir__/is_working_tree?)
 [ $? -eq 0 ]  || exit 1
 
 remote_name=$($__commands_dir__/remote_name)
@@ -14,8 +14,8 @@ then
   exit 1
 fi
 
-last_commit_sha=$(./$__commands_dir__/last_commit_sha)
-branch_name=$(./$__commands_dir__/current_branch)
+last_commit_sha=$($__commands_dir__/last_commit_sha)
+branch_name=$($__commands_dir__/current_branch)
 pre_tag="pre-gitshortcut-${branch_name}-$(date +%s)"
 
 git tag $pre_tag $last_commit_sha > /dev/null 2>&1
