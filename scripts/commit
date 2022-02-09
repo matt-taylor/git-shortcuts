@@ -78,6 +78,6 @@ git add "$(echo $COMMIT_FILES | tr -d '"')"
 git commit -m "$MESSAGE"
 
 if [ $PUSH = "0" ]; then
-  branch_name=$(./$__commands_dir__/current_branch)
+  branch_name=$($__commands_dir__/current_branch)
   git push -u $REMOTE $branch_name
 fi
