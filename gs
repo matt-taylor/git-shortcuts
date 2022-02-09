@@ -1,34 +1,28 @@
 #!/bin/bash -e
 
-__commands_dir__="$(dirname "$0")/commands"
-__scripts_dir__="$(dirname "$0")/scripts"
+REAL_FILE=$(readlink $0 || echo $0)
+BASE_DIR=$(dirname $REAL_FILE)
+
+__commands_dir__="$BASE_DIR/commands"
+__scripts_dir__="$BASE_DIR/scripts"
 __root_directory=$__scripts_dir__
 
 # Unset the positional argument if command option provided
 if [ "$1" == "-c" ] || [ "$1" == "--command" ]; then
-  params=( $* )
-  unset params[0]
-  set -- "${params[@]}"
-
+  shift
   __root_directory=$__commands_dir__
 fi
 
 # Unset the positional argument if script option provided
 if [ "$1" == "-s" ] || [ "$1" == "--script" ]; then
-  params=( $* )
-  unset params[0]
-  set -- "${params[@]}"
+  shift
 fi
 
 # Unset the next positional argument. This argument is expected to be the executable file
 file="$1"
 executable_path="$__root_directory/$file"
-executable="./$executable_path"
-params=( $* )
-unset params[0]
-set -- "${params[@]}"
-
-
+executable="$executable_path"
+shift
 
 scripts_usage () {
   echo "Available Scripts to call"
@@ -56,13 +50,12 @@ usage () {
 
 
 if [ -f "$executable_path" ]; then
-  $executable "$@"
+  eval $executable "$@"
 else
   echo "Yikes!: Usage Error $file does not exist"
   usage
   scripts_usage
   commands_usage
 fi
-
 
 
