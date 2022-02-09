@@ -1,0 +1,36 @@
+#!/bin/bash -e
+
+help_echo () {
+  echo    "Usage: install"
+  echo -e "\t -b|--bin   - The path to store the exececutable. This should be in your \$PATH"
+}
+BIN="/usr/local/bin"
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    -b|--bin)
+      BIN="$2"
+      shift # past argument
+      shift # past value
+      ;;
+    -h|--help)
+      [[ -z "$SKIP_HELP_ECHO" ]] && help_echo
+      exit 0
+      ;;
+    -*|--*)
+      echo "Unknown option $1"
+      [[ -z "$SKIP_HELP_ECHO" ]] && help_echo
+      exit 1
+      ;;
+    *)
+      shift # past argument
+      ;;
+  esac
+done
+
+parent=$(pwd)
+gs_base="gs"
+gs_path="$parent/$gs_base"
+gs_bin_path="$BIN/$gs_base"
+
+ln -s $gs_path $gs_bin_path

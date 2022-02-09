@@ -2,26 +2,42 @@
 
 __commands_dir__="$(dirname "$0")/../commands"
 
-$(./$__commands_dir__/is_working_tree?)
+$($__commands_dir__/is_working_tree?)
 [ $? -eq 0 ]  || exit 1
 
 help_echo () {
   echo    "Usage: commit"
   echo -e "\t -f|--files    - Regex of files to commit."
   echo -e "\t -m|--message  - Commit message to set"
+  echo -e "\t -p|--push     - Set bit when you want to send to origin"
+  echo -e "\t -r|--remote   - Origin name. By default it is origin"
 }
 
 POSITIONAL_ARGS=()
 COMMIT_FILES=""
+PUSH="1"
+REMOTE="origin"
 MESSAGE=""
+LAST_UPDATED='none'
 while [[ $# -gt 0 ]]; do
   case $1 in
+    -p|--push)
+      PUSH="0"
+      shift # past value
+      ;;
+    -r|--remote)
+      REMOTE="$2"
+      shift # past argument
+      shift # past value
+      ;;
     -m|--message)
+      LAST_UPDATED='message'
       MESSAGE="$2"
       shift # past argument
       shift # past value
       ;;
     -f|--files)
+      LAST_UPDATED='commit'
       COMMIT_FILES="$2"
       shift # past argument
       shift # past value
@@ -31,12 +47,16 @@ while [[ $# -gt 0 ]]; do
       exit 0
       ;;
     -*|--*)
-      echo "Unknown option $1"
+      echo "Unknown option: $1"
       [[ -z "$SKIP_HELP_ECHO" ]] && help_echo
       exit 1
       ;;
     *)
-      POSITIONAL_ARGS+=("$1") # save positional arg
+      if [ $LAST_UPDATED = "message" ]; then
+        MESSAGE="$MESSAGE $1"
+      elif [ $LAST_UPDATED = "commit" ]; then
+        COMMIT_FILES="$COMMIT_FILES $1"
+      fi
       shift # past argument
       ;;
   esac
@@ -56,3 +76,8 @@ fi
 
 git add "$(echo $COMMIT_FILES | tr -d '"')"
 git commit -m "$MESSAGE"
+
+if [ $PUSH = "0" ]; then
+  branch_name=$($__commands_dir__/current_branch)
+  git push -u $REMOTE $branch_name
+fi

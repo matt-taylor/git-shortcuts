@@ -3,7 +3,7 @@
 __commands_dir__="$(dirname "$0")/../commands"
 __scripts_dir__="$(dirname "$0")"
 
-$(./$__commands_dir__/is_working_tree?)
+$($__commands_dir__/is_working_tree?)
 [ $? -eq 0 ]  || exit 1
 
 help_echo () {
@@ -65,10 +65,10 @@ done
 
 if [ $COMMIT = "0" ]; then
   export SKIP_HELP_ECHO='0'
-  ./$__scripts_dir__/commit -f "\"$COMMIT_FILES\"" -m "$MESSAGE"
+  $__scripts_dir__/commit -f "\"$COMMIT_FILES\"" -m "$MESSAGE"
   # [ $? -eq 0 ]  || exit 1
 fi
-branch_name=$(./$__commands_dir__/current_branch)
+branch_name=$($__commands_dir__/current_branch)
 MESSAGE="${MESSAGE:='stashing without a commit'}"
 
 git stash -m "gs-merge: $MESSAGE"
