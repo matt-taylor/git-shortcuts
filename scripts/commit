@@ -11,11 +11,13 @@ help_echo () {
   echo -e "\t -m|--message  - Commit message to set"
   echo -e "\t -p|--push     - Set bit when you want to send to origin"
   echo -e "\t -r|--remote   - Origin name. By default it is origin"
+  echo -e "\t -e|--empty    - Empty commit"
 }
 
 POSITIONAL_ARGS=()
 COMMIT_FILES=""
 PUSH="1"
+EMPTY="1"
 REMOTE="origin"
 MESSAGE=""
 LAST_UPDATED='none'
@@ -23,6 +25,10 @@ while [[ $# -gt 0 ]]; do
   case $1 in
     -p|--push)
       PUSH="0"
+      shift # past value
+      ;;
+    -e|--empty)
+      EMPTY="0"
       shift # past value
       ;;
     -r|--remote)
@@ -68,14 +74,20 @@ if [[ -z "$MESSAGE" ]]; then
   exit 1
 fi
 
-if [[ -z "$COMMIT_FILES" ]]; then
-  echo "Commit regex must be present. Exit 1" >&2
-  [[ -z "$SKIP_HELP_ECHO" ]] && help_echo
-  exit 1
+if [ "$EMPTY" = "0" ]; then
+  git commit --allow-empty -m "$MESSAGE"
+else
+  if [[ -z "$COMMIT_FILES" ]]; then
+    echo "Commit regex must be present. Exit 1" >&2
+    [[ -z "$SKIP_HELP_ECHO" ]] && help_echo
+    exit 1
+  fi
+
+  git add "$(echo $COMMIT_FILES | tr -d '"')"
+  git commit -m "$MESSAGE"
 fi
 
-git add "$(echo $COMMIT_FILES | tr -d '"')"
-git commit -m "$MESSAGE"
+
 
 if [ $PUSH = "0" ]; then
   branch_name=$($__commands_dir__/current_branch)
